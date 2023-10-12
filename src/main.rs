@@ -19,7 +19,7 @@ fn main() {
         available_subsidies -= block_subsidy;
 
         println!(
-            "Block {} ({:.2} years): Subsidy: {}({} ZEC), ZSF: {}({} ZEC)",
+            "Block {} (~{:.2} years): Subsidy: {} (~{} ZEC), ZSF: {} (~{} ZEC)",
             block,                                  // current block
             block as f64 / BLOCKS_PER_YEAR as f64,  // ~ current year
             block_subsidy,                          // block subsidy in zatoshis
