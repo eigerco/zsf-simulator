@@ -150,5 +150,5 @@ Halving 28 at block 47040000:
 
 The program will also output PNG files with plots of the issuance curve in `plots/`:
 
-![ZSF issuance simulation - full range](plots/zsf_issuance_plot_full.png)
-![ZSF issuance simulation - 20% of range](plots/zsf_issuance_plot_short.png)
+![ZSF balance simulation](plots/zsf_balance.png)
+![ZSF block subsidy simulation](plots/zsf_block_subsidy.png)
