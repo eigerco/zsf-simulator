@@ -1,55 +1,16 @@
-use plotters::{
-    prelude::{BitMapBackend, ChartBuilder, IntoDrawingArea},
-    series::LineSeries,
-    style::*,
-};
+use crate::plots::{generate_plots, PLOT_SAMPLING};
 
+pub const MAX_MONEY: i64 = 21_000_000;
 const BLOCKS_PER_YEAR: u32 = 420_768;
 const ZATOSHIS_PER_ZEC: i64 = 100_000_000;
 // predicted ZEC supply at the next halving (block 2726400)
 const INITIAL_SUPPLY: i64 = 1_574_963_454_129_680;
-const MAX_MONEY: i64 = 21_000_000;
 const INITIAL_SUBSIDIES: i64 = MAX_MONEY * ZATOSHIS_PER_ZEC - INITIAL_SUPPLY;
 
 const BLOCK_SUBSIDY_NUMERATOR: i64 = 4126;
 const BLOCK_SUBSIDY_DENOMINATOR: i64 = 10_000_000_000;
 
-const FULL_PLOT_PATH: &str = "plots/zsf_issuance_plot_full.png";
-const SHORT_PLOT_PATH: &str = "plots/zsf_issuance_plot_short.png";
-const SHORT_PLOT_DIVISOR: usize = 5;
-const PLOT_EVERY: u32 = 1000;
-
-fn plot(points: &[(f64, f64)], years: f64, path: &str) {
-    let root = BitMapBackend::new(path, (1024, 768)).into_drawing_area();
-
-    root.fill(&WHITE).unwrap();
-
-    let mut chart = ChartBuilder::on(&root)
-        .caption("ZSF issuance curve", ("sans-serif", 50).into_font())
-        .margin(50)
-        .x_label_area_size(50)
-        .y_label_area_size(50)
-        .build_cartesian_2d(0f64..years, 0f64..(MAX_MONEY as f64))
-        .unwrap();
-
-    chart
-        .configure_mesh()
-        .bold_line_style(WHITE.mix(0.3))
-        .y_desc("ZSF balance in ZEC")
-        .x_desc("Years from activation")
-        .axis_desc_style(("sans-serif", 15))
-        .y_label_formatter(&|x| format!("{}M", x / 1_000_000_f64))
-        .draw()
-        .unwrap();
-
-    let series = LineSeries::new(points.to_owned(), &RED);
-
-    chart.draw_series(series).unwrap();
-
-    root.present().unwrap();
-
-    println!("Plot saved to {}", path);
-}
+mod plots;
 
 fn main() {
     let mut available_subsidies: i64 = INITIAL_SUBSIDIES;
@@ -73,7 +34,7 @@ fn main() {
             available_subsidies / ZATOSHIS_PER_ZEC  // available subsidies in ZEC
         );
 
-        if block % PLOT_EVERY == 0 {
+        if block % PLOT_SAMPLING == 0 {
             points.push((
                 block as f64 / BLOCKS_PER_YEAR as f64,
                 available_subsidies as f64 / ZATOSHIS_PER_ZEC as f64,
@@ -89,13 +50,5 @@ fn main() {
 
     let years = block as f64 / BLOCKS_PER_YEAR as f64;
 
-    // plot the entire range
-    plot(&points, years, FULL_PLOT_PATH);
-
-    // plot the initial part of the graph
-    plot(
-        &points[0..(points.len() / SHORT_PLOT_DIVISOR)],
-        years / SHORT_PLOT_DIVISOR as f64,
-        SHORT_PLOT_PATH,
-    );
+    generate_plots(points, years);
 }
