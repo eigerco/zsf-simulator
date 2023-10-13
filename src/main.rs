@@ -56,7 +56,7 @@ fn simulate() -> (
 
         if available_subsidies == 0 {
             println!(
-                "Last block {} (~{:.2} years): Block subsidy: {} (~{} ZEC), ZSF balance: {} (~{} ZEC)",
+                "Last block is {} in ~{:.2} years\nFinal block subsidy: {} (~{} ZEC)\nFinal ZSF balance: {} (~{} ZEC)",
                 block,                                  // current block
                 block as f64 / BLOCKS_PER_YEAR as f64,  // ~ current year
                 block_subsidy,                          // block subsidy in zatoshis

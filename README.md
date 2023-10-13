@@ -26,7 +26,9 @@ cargo run
 The program will output the final block that subsidies will be paid out from:
 
 ```
-Block 47917869 (~113.88 years): Subsidy: 1 (~0 ZEC), ZSF: 0 (~0 ZEC)
+Last block is 47917869 in ~113.88 years
+Final block subsidy: 1 (~0 ZEC)
+Final ZSF balance: 0 (~0 ZEC)
 ```
 
 As well as a summary of subsidies paid out during 4 year periods in between halvings in comparison with the current
