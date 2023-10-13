@@ -84,7 +84,7 @@ fn main() {
     }
 
     println!("#############################################");
-    println!("Final block: {}", block);
+    println!("Final block: {}", block - 1);
     println!("#############################################");
 
     let years = block as f64 / BLOCKS_PER_YEAR as f64;
