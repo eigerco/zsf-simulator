@@ -110,13 +110,14 @@ fn print_halving(halvings: Vec<i64>) {
         let ratio = *zsf_halving_subsidies as f64 / legacy_halving_subsidies as f64;
 
         println!(
-            "Halving {:>2} at block {:>8}:\n  ZSF subsidies:    {:>15} (~{:>7} ZEC)\n  legacy subsidies: {:>15} (~{:>7} ZEC) ({:.8} ZEC per block)\n  difference:       {:>15} (~{:>7} ZEC), ZSF/legacy: {:.4}",
+            "Halving {:>2} at block {:>8}:\n  ZSF subsidies:    {:>15} (~{:>12.3} ZEC, {:>12.3} ZEC per block)\n  legacy subsidies: {:>15} (~{:>12.3} ZEC, {:>12.3} ZEC per block)\n  difference:       {:>15} (~{:>12.3} ZEC),         ZSF/legacy: {:.4}",
             i + 1,
             (i + 1) as u32 * POST_BLOSSOM_HALVING_INTERVAL,
             zsf_halving_subsidies,
-            zsf_halving_subsidies / ZATOSHIS_PER_ZEC,
+            *zsf_halving_subsidies as f64 / ZATOSHIS_PER_ZEC as f64,
+            *zsf_halving_subsidies as f64 / POST_BLOSSOM_HALVING_INTERVAL as f64 / ZATOSHIS_PER_ZEC as f64,
             legacy_halving_subsidies,
-            legacy_halving_subsidies / ZATOSHIS_PER_ZEC,
+            legacy_halving_subsidies as f64 / ZATOSHIS_PER_ZEC as f64,
             legacy_subsidy_per_block as f64 / ZATOSHIS_PER_ZEC as f64,
             difference,
             difference / ZATOSHIS_PER_ZEC,
