@@ -157,7 +157,7 @@ The program will also output PNG files with plots of the issuance curve in `plot
 
 ## About this repo
 
-This estimator is part of our larger efforts to implement the Zcash Sustainability Fund, watch the presentation [here](https://www.youtube.com/watch?v=_QSYgvDV33k)
+This simulator is part of our larger efforts to implement the Zcash Sustainability Fund, watch the presentation [here](https://www.youtube.com/watch?v=_QSYgvDV33k)
 
 ## About [Eiger](https://www.eiger.co)
 
