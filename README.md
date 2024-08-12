@@ -154,3 +154,14 @@ The program will also output PNG files with plots of the issuance curve in `plot
 
 ![ZSF balance simulation](plots/zsf_balance.png)
 ![ZSF block subsidy simulation](plots/zsf_block_subsidy.png)
+
+## About this repo
+
+This simulator is part of our larger efforts to implement the Zcash Sustainability Fund, watch the presentation [here](https://www.youtube.com/watch?v=_QSYgvDV33k)
+
+## About [Eiger](https://www.eiger.co)
+
+We are engineers. We contribute to various ecosystems by building low level implementations and core components. We believe in Zcash because privacy is critical to a well functioning society.
+
+Contact us at hello@eiger.co
+Follow us on [X/Twitter](https://x.com/eiger_co)
