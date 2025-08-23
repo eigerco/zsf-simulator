@@ -1,134 +1,185 @@
 use crate::plots::{generate_plots, PLOT_SAMPLING};
 
-pub const MAX_MONEY: i64 = 21_000_000;
-const BLOCKS_PER_YEAR: u32 = 420_768;
-const ZATOSHIS_PER_ZEC: i64 = 100_000_000;
-// predicted ZEC supply at the next halving (block 2726400)
-const INITIAL_SUPPLY: i64 = 1_574_963_454_129_680;
-const INITIAL_SUBSIDIES: i64 = MAX_MONEY * ZATOSHIS_PER_ZEC - INITIAL_SUPPLY;
-
-const BLOCK_SUBSIDY_NUMERATOR: i64 = 4126;
-const BLOCK_SUBSIDY_DENOMINATOR: i64 = 10_000_000_000;
-
-const POST_BLOSSOM_HALVING_INTERVAL: u32 = 1_680_000;
-// block subsidy starting at the next halving (block 2726400)
-const INITIAL_LEGACY_BLOCK_SUBSIDY: i64 = 50 * ZATOSHIS_PER_ZEC / 32;
-
 mod plots;
 
+type Height = i64; // or height interval
+type Zats = i64;
+
+pub const MAX_MONEY: Zats = 21_000_000;
+const BLOCKS_PER_YEAR: i64 = 420_768;
+const ZATOSHIS_PER_ZEC: Zats = 1_0000_0000;
+const INITIAL_HALVING: usize = 2;
+const INITIAL_HALVING_HEIGHT: Height = 2726400;
+// Predicted ZEC supply at INITIAL_HALVING. TODO: check this.
+const INITIAL_SUPPLY: Zats = 1_574_963_454_129_680;
+const INITIAL_SUBSIDIES: Zats = MAX_MONEY * ZATOSHIS_PER_ZEC - INITIAL_SUPPLY;
+
+const NSM_BLOCK_SUBSIDY_NUMERATOR: i64 = 4126;
+const NSM_BLOCK_SUBSIDY_DENOMINATOR: i64 = 10_000_000_000;
+
+const POST_BLOSSOM_HALVING_INTERVAL: Height = 1_680_000;
+// Block subsidy at INITIAL_HALVING_HEIGHT.
+const INITIAL_NO_NSM_BLOCK_SUBSIDY: Zats = 12_5000_0000 / 8;
+
+fn to_zec(zatoshis: Zats) -> f64 {
+    zatoshis as f64 / ZATOSHIS_PER_ZEC as f64
+}
+
+fn years_after_initial(height: Height) -> f64 {
+    (height - INITIAL_HALVING_HEIGHT) as f64 / BLOCKS_PER_YEAR as f64
+}
+
+fn no_nsm_block_subsidy_for_height(height: Height) -> Zats {
+    assert!(height >= INITIAL_HALVING_HEIGHT);
+    let halving_after_initial = (height - INITIAL_HALVING_HEIGHT) / POST_BLOSSOM_HALVING_INTERVAL;
+    INITIAL_NO_NSM_BLOCK_SUBSIDY >> std::cmp::min(halving_after_initial, 63)
+}
+
+struct Stats {
+    pub index: i64,
+    pub end_height: i64,
+    pub nsm_subsidies: i64,
+    pub no_nsm_subsidies: i64,
+}
+
+impl Stats {
+    fn summary(self: &Stats) -> String {
+        let difference = self.nsm_subsidies - self.no_nsm_subsidies;
+        let ratio = self.nsm_subsidies as f64 / self.no_nsm_subsidies as f64;
+        let end_year = self.index * 4;
+        format!(
+            "Years {:>3}..{:>3} at heights {:>8}..{:>8}:\n  \
+               NSM subsidies:    {:>15} (~{:>12.3} ZEC, {:>12.8} ZEC per block)\n  \
+               no-NSM subsidies: {:>15} (~{:>12.3} ZEC, {:>12.8} ZEC per block)\n  \
+               difference:       {:>15} (~{:>12.3} ZEC),         NSM/no-NSM: {:.4}",
+            end_year - 4,
+            end_year,
+            self.end_height - POST_BLOSSOM_HALVING_INTERVAL,
+            self.end_height,
+            self.nsm_subsidies,
+            to_zec(self.nsm_subsidies),
+            self.nsm_subsidies as f64
+                / POST_BLOSSOM_HALVING_INTERVAL as f64
+                / ZATOSHIS_PER_ZEC as f64,
+            self.no_nsm_subsidies,
+            to_zec(self.no_nsm_subsidies),
+            self.no_nsm_subsidies as f64
+                / POST_BLOSSOM_HALVING_INTERVAL as f64
+                / ZATOSHIS_PER_ZEC as f64,
+            difference,
+            to_zec(difference),
+            ratio
+        )
+    }
+}
+
 fn main() {
-    let (block, balance_points, zsf_reward_points, legacy_reward_points, halvings) = simulate();
+    let (end_height, balance_points, nsm_reward_points, no_nsm_reward_points, four_year_stats) =
+        simulate();
 
-    print_halving(halvings);
-
-    let years = block as f64 / BLOCKS_PER_YEAR as f64;
+    print_four_year_stats(&four_year_stats);
 
     generate_plots(
         balance_points,
-        zsf_reward_points,
-        legacy_reward_points,
-        years,
+        nsm_reward_points,
+        no_nsm_reward_points,
+        years_after_initial(end_height),
     );
 }
 
+#[allow(clippy::type_complexity)]
 fn simulate() -> (
-    u32,
+    Height,
     Vec<(f64, f64)>,
     Vec<(f64, f64)>,
     Vec<(f64, f64)>,
-    Vec<i64>,
+    Vec<Stats>,
 ) {
-    let mut available_subsidies: i64 = INITIAL_SUBSIDIES;
-    let mut block: u32 = 0;
+    let mut available_subsidies: Zats = INITIAL_SUBSIDIES;
+    let mut height: Height = INITIAL_HALVING_HEIGHT;
 
     let mut balance_points: Vec<(f64, f64)> = Vec::new();
-    let mut zsf_reward_points: Vec<(f64, f64)> = Vec::new();
-    let mut legacy_reward_points: Vec<(f64, f64)> = Vec::new();
-    let mut halvings: Vec<i64> = Vec::new();
-    let mut halving_subsidies: i64 = 0;
+    let mut nsm_reward_points: Vec<(f64, f64)> = Vec::new();
+    let mut no_nsm_reward_points: Vec<(f64, f64)> = Vec::new();
+    let mut four_year_stats: Vec<Stats> = Vec::new();
+    let mut four_year_nsm_subsidies: Zats = 0;
+    let mut four_year_no_nsm_subsidies: Zats = 0;
+    let mut nsm_deployment_height: Option<Height> = None;
 
     while available_subsidies > 0 {
-        let block_subsidy = (available_subsidies * BLOCK_SUBSIDY_NUMERATOR
-            + (BLOCK_SUBSIDY_DENOMINATOR - 1))
-            / BLOCK_SUBSIDY_DENOMINATOR;
+        let years = years_after_initial(height);
+        let nsm_block_subsidy = (available_subsidies * NSM_BLOCK_SUBSIDY_NUMERATOR
+            + (NSM_BLOCK_SUBSIDY_DENOMINATOR - 1))
+            / NSM_BLOCK_SUBSIDY_DENOMINATOR;
+
+        let no_nsm_block_subsidy = no_nsm_block_subsidy_for_height(height);
+
+        if nsm_deployment_height.is_none() && nsm_block_subsidy < no_nsm_block_subsidy {
+            nsm_deployment_height = Some(height);
+            println!("DEPLOYMENT_BLOCK_HEIGHT = {height} ({years:.2} years after {INITIAL_HALVING}nd halving)");
+        }
+
+        let block_subsidy = if nsm_deployment_height.is_some() {
+            four_year_nsm_subsidies += nsm_block_subsidy;
+            four_year_no_nsm_subsidies += no_nsm_block_subsidy;
+            nsm_block_subsidy
+        } else {
+            no_nsm_block_subsidy
+        };
         available_subsidies -= block_subsidy;
-        halving_subsidies += block_subsidy;
 
         if available_subsidies == 0 {
             println!(
-                "Last block is {} in ~{:.2} years\nFinal block subsidy: {} (~{} ZEC)\nFinal ZSF balance: {} (~{} ZEC)",
-                block,                                  // current block
-                block as f64 / BLOCKS_PER_YEAR as f64,  // ~ current year
-                block_subsidy,                          // block subsidy in zatoshis
-                block_subsidy / ZATOSHIS_PER_ZEC,       // block subsidy in ZEC
-                available_subsidies,                    // available subsidies in zatoshis
-                available_subsidies / ZATOSHIS_PER_ZEC  // available subsidies in ZEC
+                "Last block with non-zero subsidy is at height {} in ~{:.2} years after the {}nd halving.\n\
+                 Final block subsidy: {} (~{} ZEC)\n\
+                 Final NSM balance: {} (~{} ZEC)",
+                height,                     // current height
+                years,                      // ~ current year after initial halving
+                INITIAL_HALVING,            // initial halving ordinal
+                block_subsidy,              // block subsidy in zatoshis
+                to_zec(block_subsidy),      // block subsidy in ZEC
+                available_subsidies,        // available subsidies in zatoshis
+                to_zec(available_subsidies) // available subsidies in ZEC
             );
         }
 
-        if block % PLOT_SAMPLING == 0 {
-            let block_float = block as f64 / BLOCKS_PER_YEAR as f64;
-            balance_points.push((
-                block_float,
-                available_subsidies as f64 / ZATOSHIS_PER_ZEC as f64,
-            ));
-
-            zsf_reward_points.push((block_float, block_subsidy as f64 / ZATOSHIS_PER_ZEC as f64));
-
-            legacy_reward_points.push((
-                block_float,
-                ((INITIAL_LEGACY_BLOCK_SUBSIDY / 2_i64.pow(block / POST_BLOSSOM_HALVING_INTERVAL))
-                    as f64)
-                    / ZATOSHIS_PER_ZEC as f64,
-            ));
+        if ((height - INITIAL_HALVING_HEIGHT) as u32) % PLOT_SAMPLING == 0 {
+            balance_points.push((years, to_zec(available_subsidies)));
+            nsm_reward_points.push((years, to_zec(block_subsidy)));
+            no_nsm_reward_points.push((years, to_zec(no_nsm_block_subsidy)));
         }
 
-        if block > 0 && block % POST_BLOSSOM_HALVING_INTERVAL == 0 {
-            halvings.push(halving_subsidies);
-            halving_subsidies = 0;
+        if let Some(h) = nsm_deployment_height {
+            if height > h && (height - h) % POST_BLOSSOM_HALVING_INTERVAL == 0 {
+                four_year_stats.push(Stats {
+                    index: (height - h) / POST_BLOSSOM_HALVING_INTERVAL,
+                    end_height: height,
+                    nsm_subsidies: four_year_nsm_subsidies,
+                    no_nsm_subsidies: four_year_no_nsm_subsidies,
+                });
+                four_year_nsm_subsidies = 0;
+                four_year_no_nsm_subsidies = 0;
+            }
         }
 
-        block += 1;
+        height += 1;
     }
     (
-        block,
+        height,
         balance_points,
-        zsf_reward_points,
-        legacy_reward_points,
-        halvings,
+        nsm_reward_points,
+        no_nsm_reward_points,
+        four_year_stats,
     )
 }
 
-fn print_halving(halvings: Vec<i64>) {
+fn print_four_year_stats(four_year_stats: &Vec<Stats>) {
     println!("#############################################");
-    println!("Halvings:");
+    println!("Four-year periods:");
 
-    for (i, zsf_halving_subsidies) in halvings.iter().enumerate() {
-        let legacy_subsidy_per_block = INITIAL_LEGACY_BLOCK_SUBSIDY / 2_i64.pow(i as u32);
-        let legacy_halving_subsidies = legacy_subsidies_for_halving(i as u32);
-        let difference = zsf_halving_subsidies - legacy_halving_subsidies;
-        let ratio = *zsf_halving_subsidies as f64 / legacy_halving_subsidies as f64;
-
-        println!(
-            "Halving {:>2} at block {:>8}:\n  ZSF subsidies:    {:>15} (~{:>12.3} ZEC, {:>12.3} ZEC per block)\n  legacy subsidies: {:>15} (~{:>12.3} ZEC, {:>12.3} ZEC per block)\n  difference:       {:>15} (~{:>12.3} ZEC),         ZSF/legacy: {:.4}",
-            i + 1,
-            (i + 1) as u32 * POST_BLOSSOM_HALVING_INTERVAL,
-            zsf_halving_subsidies,
-            *zsf_halving_subsidies as f64 / ZATOSHIS_PER_ZEC as f64,
-            *zsf_halving_subsidies as f64 / POST_BLOSSOM_HALVING_INTERVAL as f64 / ZATOSHIS_PER_ZEC as f64,
-            legacy_halving_subsidies,
-            legacy_halving_subsidies as f64 / ZATOSHIS_PER_ZEC as f64,
-            legacy_subsidy_per_block as f64 / ZATOSHIS_PER_ZEC as f64,
-            difference,
-            difference / ZATOSHIS_PER_ZEC,
-            ratio
-        );
+    for stats in four_year_stats {
+        println!("{}", stats.summary());
     }
 
     println!("#############################################");
-}
-
-fn legacy_subsidies_for_halving(halving: u32) -> i64 {
-    let subsidy_for_halving = INITIAL_LEGACY_BLOCK_SUBSIDY / 2_i64.pow(halving);
-    POST_BLOSSOM_HALVING_INTERVAL as i64 * subsidy_for_halving
 }
