@@ -4,7 +4,7 @@ use plotters::{
     style::*,
 };
 
-use crate::{INITIAL_HALVING, MAX_MONEY};
+use crate::INITIAL_HALVING;
 
 const BALANCE_PLOT_PATH: &str = "plots/nsm_balance.png";
 const BLOCK_SUBSIDY_PLOT_PATH: &str = "plots/nsm_block_subsidy.png";
@@ -39,7 +39,7 @@ fn balance_plot(points: &[(f64, f64)], years: f64) {
         .margin(50)
         .x_label_area_size(50)
         .y_label_area_size(50)
-        .build_cartesian_2d(0f64..years, 0f64..(MAX_MONEY as f64))
+        .build_cartesian_2d(0f64..years, 0f64..6_000_000_f64)
         .unwrap();
 
     chart
@@ -78,7 +78,7 @@ fn block_subsidy_plot(
         .margin(50)
         .x_label_area_size(50)
         .y_label_area_size(50)
-        .build_cartesian_2d(0f64..years, 0f64..5f64)
+        .build_cartesian_2d(0f64..years, 0f64..2f64)
         .unwrap();
 
     chart
