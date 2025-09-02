@@ -8,10 +8,18 @@ type Zats = i64;
 pub const MAX_MONEY: Zats = 21_000_000;
 const BLOCKS_PER_YEAR: i64 = 420_768;
 const ZATOSHIS_PER_ZEC: Zats = 1_0000_0000;
+
 const INITIAL_HALVING: usize = 2;
 const INITIAL_HALVING_HEIGHT: Height = 2726400;
-// Predicted ZEC supply at INITIAL_HALVING. TODO: check this.
-const INITIAL_SUPPLY: Zats = 1_574_963_454_129_680;
+
+/// ZEC supply at INITIAL_HALVING.
+/// The maximum possible supply at the second halving was 1_575_000_000_000_000.
+/// The value below takes into account unclaimed mining rewards up to the second halving,
+/// according to `zcash-cli getblock 2726399 | jq '.chainSupply'`. After the second
+/// halving, which coincides with NU6 and activation of ZIP 236, there can be no further
+/// unclaimed mining rewards.
+const INITIAL_SUPPLY: Zats = 1_574_963_141_554_480;
+
 const INITIAL_SUBSIDIES: Zats = MAX_MONEY * ZATOSHIS_PER_ZEC - INITIAL_SUPPLY;
 
 const NSM_BLOCK_SUBSIDY_NUMERATOR: i64 = 4126;
