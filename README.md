@@ -1,167 +1,179 @@
-# Zcash Sustainaiblity Fund simulator
+# Network Sustainability Mechanism simulator
 
-This short Rust program simulates Zcash Block Rewards (aka Block Subsidies) assuming Zcash Sustainability Fund backed smoothing out of the issuance curve will be implemented (https://github.com/zcash/zips/pull/706).
+This short Rust program simulates Zcash Block Subsidies, assuming that smoothing of the
+issuance curve in line with the Network Sustainability Mechanism will be implemented as
+specified in [ZIP 234](https://zips.z.cash/zip-0234).
 
 ## Running
 
-### Devenv
-You can use [devenv.sh](https://devenv.sh/) to setup a development environment. Otherwise follow the instructions below.
-
 ### Manual setup
 
-To run the program, you need to have Rust installed. You'll also need some extra libraries to enable plotting, on Ubuntu do:
+To run the program, you need to have Rust installed. You'll also need some extra libraries
+to enable plotting, on Ubuntu do:
 
 ```
 sudo apt install pkg-config libfreetype6-dev libfontconfig1-dev
 ```
 
- Then, clone this repository and run:
+Then, clone this repository and run:
 
 ```
 cargo run
 ```
 
+## Disclaimer
+
+This fork of Eiger's "[ZSF simulator](https://github.com/eigerco/zsf-simulator)" has been
+significantly modified by me, Daira-Emma Hopwood. Any errors in the interpretation of
+ZIP 234 are my own.
+
 ## Output
 
-The program will output the final block that subsidies will be paid out from:
+The program will output the final block that subsidies would be paid out from
+according to ZIP 234:
 
 ```
-Last block is 47917869 in ~113.88 years
-Final block subsidy: 1 (~0 ZEC)
-Final ZSF balance: 0 (~0 ZEC)
+DEPLOYMENT_BLOCK_HEIGHT = 3662982 (2.23 years after 2nd halving)
+Last block with non-zero subsidy is at height 50788960 in ~114.23 years after the 2nd halving.
+Final block subsidy: 1 (~0.00000001 ZEC)
+Final NSM balance: 0 (~0 ZEC)
 ```
 
-As well as a summary of subsidies paid out during 4 year periods in between halvings in comparison with the current
-issuance scheme:
+It also gives a summary of subsidies that would be paid out during 4-year periods
+after NSM deployment in comparison with the current issuance scheme. (Note that
+these periods do not line up with halving periods under the current scheme.)
 
 ```
-Halvings:
-Halving  1 at block  1680000:
-  ZSF subsidies:    262523884819889 (~ 2625238.848 ZEC,        1.563 ZEC per block)
-  legacy subsidies: 262500000000000 (~ 2625000.000 ZEC,        1.562 ZEC per block)
-  difference:           23884819889 (~         238 ZEC),         ZSF/legacy: 1.0001
-Halving  2 at block  3360000:
-  ZSF subsidies:    131259082555273 (~ 1312590.826 ZEC,        0.781 ZEC per block)
-  legacy subsidies: 131250000000000 (~ 1312500.000 ZEC,        0.781 ZEC per block)
-  difference:            9082555273 (~          90 ZEC),         ZSF/legacy: 1.0001
-Halving  3 at block  5040000:
-  ZSF subsidies:     65628165536456 (~  656281.655 ZEC,        0.391 ZEC per block)
-  legacy subsidies:  65625000000000 (~  656250.000 ZEC,        0.391 ZEC per block)
-  difference:            3165536456 (~          31 ZEC),         ZSF/legacy: 1.0000
-Halving  4 at block  6720000:
-  ZSF subsidies:     32813394913130 (~  328133.949 ZEC,        0.195 ZEC per block)
-  legacy subsidies:  32812500000000 (~  328125.000 ZEC,        0.195 ZEC per block)
-  difference:             894913130 (~           8 ZEC),         ZSF/legacy: 1.0000
-Halving  5 at block  8400000:
-  ZSF subsidies:     16406353535358 (~  164063.535 ZEC,        0.098 ZEC per block)
-  legacy subsidies:  16406250000000 (~  164062.500 ZEC,        0.098 ZEC per block)
-  difference:             103535358 (~           1 ZEC),         ZSF/legacy: 1.0000
-Halving  6 at block 10080000:
-  ZSF subsidies:      8203004810267 (~   82030.048 ZEC,        0.049 ZEC per block)
-  legacy subsidies:   8203124160000 (~   82031.242 ZEC,        0.049 ZEC per block)
-  difference:            -119349733 (~          -1 ZEC),         ZSF/legacy: 1.0000
-Halving  7 at block 11760000:
-  ZSF subsidies:      4101416429306 (~   41014.164 ZEC,        0.024 ZEC per block)
-  legacy subsidies:   4101562080000 (~   41015.621 ZEC,        0.024 ZEC per block)
-  difference:            -145650694 (~          -1 ZEC),         ZSF/legacy: 1.0000
-Halving  8 at block 13440000:
-  ZSF subsidies:      2050665226986 (~   20506.652 ZEC,        0.012 ZEC per block)
-  legacy subsidies:   2050781040000 (~   20507.810 ZEC,        0.012 ZEC per block)
-  difference:            -115813014 (~          -1 ZEC),         ZSF/legacy: 0.9999
-Halving  9 at block 15120000:
-  ZSF subsidies:      1025311119937 (~   10253.111 ZEC,        0.006 ZEC per block)
-  legacy subsidies:   1025389680000 (~   10253.897 ZEC,        0.006 ZEC per block)
-  difference:             -78560063 (~           0 ZEC),         ZSF/legacy: 0.9999
-Halving 10 at block 16800000:
-  ZSF subsidies:       512644813724 (~    5126.448 ZEC,        0.003 ZEC per block)
-  legacy subsidies:    512694000000 (~    5126.940 ZEC,        0.003 ZEC per block)
-  difference:             -49186276 (~           0 ZEC),         ZSF/legacy: 0.9999
-Halving 11 at block 18480000:
-  ZSF subsidies:       256317033772 (~    2563.170 ZEC,        0.002 ZEC per block)
-  legacy subsidies:    256346160000 (~    2563.462 ZEC,        0.002 ZEC per block)
-  difference:             -29126228 (~           0 ZEC),         ZSF/legacy: 0.9999
-Halving 12 at block 20160000:
-  ZSF subsidies:       128155830300 (~    1281.558 ZEC,        0.001 ZEC per block)
-  legacy subsidies:    128172240000 (~    1281.722 ZEC,        0.001 ZEC per block)
-  difference:             -16409700 (~           0 ZEC),         ZSF/legacy: 0.9999
-Halving 13 at block 21840000:
-  ZSF subsidies:        64076572065 (~     640.766 ZEC,        0.000 ZEC per block)
-  legacy subsidies:     64085280000 (~     640.853 ZEC,        0.000 ZEC per block)
-  difference:              -8707935 (~           0 ZEC),         ZSF/legacy: 0.9999
-Halving 14 at block 23520000:
-  ZSF subsidies:        32037614417 (~     320.376 ZEC,        0.000 ZEC per block)
-  legacy subsidies:     32042640000 (~     320.426 ZEC,        0.000 ZEC per block)
-  difference:              -5025583 (~           0 ZEC),         ZSF/legacy: 0.9998
-Halving 15 at block 25200000:
-  ZSF subsidies:        16018471375 (~     160.185 ZEC,        0.000 ZEC per block)
-  legacy subsidies:     16020480000 (~     160.205 ZEC,        0.000 ZEC per block)
-  difference:              -2008625 (~           0 ZEC),         ZSF/legacy: 0.9999
-Halving 16 at block 26880000:
-  ZSF subsidies:         8009067846 (~      80.091 ZEC,        0.000 ZEC per block)
-  legacy subsidies:      8010240000 (~      80.102 ZEC,        0.000 ZEC per block)
-  difference:              -1172154 (~           0 ZEC),         ZSF/legacy: 0.9999
-Halving 17 at block 28560000:
-  ZSF subsidies:         4004449844 (~      40.044 ZEC,        0.000 ZEC per block)
-  legacy subsidies:      4005120000 (~      40.051 ZEC,        0.000 ZEC per block)
-  difference:               -670156 (~           0 ZEC),         ZSF/legacy: 0.9998
-Halving 18 at block 30240000:
-  ZSF subsidies:         2002182886 (~      20.022 ZEC,        0.000 ZEC per block)
-  legacy subsidies:      2002560000 (~      20.026 ZEC,        0.000 ZEC per block)
-  difference:               -377114 (~           0 ZEC),         ZSF/legacy: 0.9998
-Halving 19 at block 31920000:
-  ZSF subsidies:         1001070275 (~      10.011 ZEC,        0.000 ZEC per block)
-  legacy subsidies:      1001280000 (~      10.013 ZEC,        0.000 ZEC per block)
-  difference:               -209725 (~           0 ZEC),         ZSF/legacy: 0.9998
-Halving 20 at block 33600000:
-  ZSF subsidies:          500525701 (~       5.005 ZEC,        0.000 ZEC per block)
-  legacy subsidies:       500640000 (~       5.006 ZEC,        0.000 ZEC per block)
-  difference:               -114299 (~           0 ZEC),         ZSF/legacy: 0.9998
-Halving 21 at block 35280000:
-  ZSF subsidies:          250255480 (~       2.503 ZEC,        0.000 ZEC per block)
-  legacy subsidies:       250320000 (~       2.503 ZEC,        0.000 ZEC per block)
-  difference:                -64520 (~           0 ZEC),         ZSF/legacy: 0.9997
-Halving 22 at block 36960000:
-  ZSF subsidies:          125126575 (~       1.251 ZEC,        0.000 ZEC per block)
-  legacy subsidies:       124320000 (~       1.243 ZEC,        0.000 ZEC per block)
-  difference:                806575 (~           0 ZEC),         ZSF/legacy: 1.0065
-Halving 23 at block 38640000:
-  ZSF subsidies:           62556140 (~       0.626 ZEC,        0.000 ZEC per block)
-  legacy subsidies:        62160000 (~       0.622 ZEC,        0.000 ZEC per block)
-  difference:                396140 (~           0 ZEC),         ZSF/legacy: 1.0064
-Halving 24 at block 40320000:
-  ZSF subsidies:           31271589 (~       0.313 ZEC,        0.000 ZEC per block)
-  legacy subsidies:        30240000 (~       0.302 ZEC,        0.000 ZEC per block)
-  difference:               1031589 (~           0 ZEC),         ZSF/legacy: 1.0341
-Halving 25 at block 42000000:
-  ZSF subsidies:           15660304 (~       0.157 ZEC,        0.000 ZEC per block)
-  legacy subsidies:        15120000 (~       0.151 ZEC,        0.000 ZEC per block)
-  difference:                540304 (~           0 ZEC),         ZSF/legacy: 1.0357
-Halving 26 at block 43680000:
-  ZSF subsidies:            7766952 (~       0.078 ZEC,        0.000 ZEC per block)
-  legacy subsidies:         6720000 (~       0.067 ZEC,        0.000 ZEC per block)
-  difference:               1046952 (~           0 ZEC),         ZSF/legacy: 1.1558
-Halving 27 at block 45360000:
-  ZSF subsidies:            3962388 (~       0.040 ZEC,        0.000 ZEC per block)
-  legacy subsidies:         3360000 (~       0.034 ZEC,        0.000 ZEC per block)
-  difference:                602388 (~           0 ZEC),         ZSF/legacy: 1.1793
-Halving 28 at block 47040000:
-  ZSF subsidies:            1814216 (~       0.018 ZEC,        0.000 ZEC per block)
-  legacy subsidies:         1680000 (~       0.017 ZEC,        0.000 ZEC per block)
-  difference:                134216 (~           0 ZEC),         ZSF/legacy: 1.0799
+Four-year periods:
+Years   0..  4 at heights  3662982.. 5342982:
+  NSM subsidies:    189352008356142 (~ 1893520.084 ZEC,   1.12709529 ZEC per block)
+  no-NSM subsidies: 189329609375000 (~ 1893296.094 ZEC,   1.12696196 ZEC per block)
+  difference:           22398981142 (~     223.990 ZEC),         NSM/no-NSM: 1.0001
+Years   4..  8 at heights  5342982.. 7022982:
+  NSM subsidies:     94673941434973 (~  946739.414 ZEC,   0.56353537 ZEC per block)
+  no-NSM subsidies:  94664726562500 (~  946647.266 ZEC,   0.56348052 ZEC per block)
+  difference:            9214872473 (~      92.149 ZEC),         NSM/no-NSM: 1.0001
+Years   8.. 12 at heights  7022982.. 8702982:
+  NSM subsidies:     47335978429372 (~  473359.784 ZEC,   0.28176178 ZEC per block)
+  no-NSM subsidies:  47332363281250 (~  473323.633 ZEC,   0.28174026 ZEC per block)
+  difference:            3615148122 (~      36.151 ZEC),         NSM/no-NSM: 1.0001
+Years  12.. 16 at heights  8702982..10382982:
+  NSM subsidies:     23667493081637 (~  236674.931 ZEC,   0.14087794 ZEC per block)
+  no-NSM subsidies:  23666181640625 (~  236661.816 ZEC,   0.14087013 ZEC per block)
+  difference:            1311441012 (~      13.114 ZEC),         NSM/no-NSM: 1.0001
+Years  16.. 20 at heights 10382982..12062982:
+  NSM subsidies:     11833498478705 (~  118334.985 ZEC,   0.07043749 ZEC per block)
+  no-NSM subsidies:  11833090352021 (~  118330.904 ZEC,   0.07043506 ZEC per block)
+  difference:             408126684 (~       4.081 ZEC),         NSM/no-NSM: 1.0000
+Years  20.. 24 at heights 12062982..13742982:
+  NSM subsidies:      5916625210905 (~   59166.252 ZEC,   0.03521801 ZEC per block)
+  no-NSM subsidies:   5916544804302 (~   59165.448 ZEC,   0.03521753 ZEC per block)
+  difference:              80406603 (~       0.804 ZEC),         NSM/no-NSM: 1.0000
+Years  24.. 28 at heights 13742982..15422982:
+  NSM subsidies:      2958250593150 (~   29582.506 ZEC,   0.01760863 ZEC per block)
+  no-NSM subsidies:   2958272402151 (~   29582.724 ZEC,   0.01760876 ZEC per block)
+  difference:             -21809001 (~      -0.218 ZEC),         NSM/no-NSM: 1.0000
+Years  28.. 32 at heights 15422982..17102982:
+  NSM subsidies:      1479094290614 (~   14790.943 ZEC,   0.00880413 ZEC per block)
+  no-NSM subsidies:   1479135732784 (~   14791.357 ZEC,   0.00880438 ZEC per block)
+  difference:             -41442170 (~      -0.414 ZEC),         NSM/no-NSM: 1.0000
+Years  32.. 36 at heights 17102982..18782982:
+  NSM subsidies:       739531642870 (~    7395.316 ZEC,   0.00440197 ZEC per block)
+  no-NSM subsidies:    739567026392 (~    7395.670 ZEC,   0.00440218 ZEC per block)
+  difference:             -35383522 (~      -0.354 ZEC),         NSM/no-NSM: 1.0000
+Years  36.. 40 at heights 18782982..20462982:
+  NSM subsidies:       369758070268 (~    3697.581 ZEC,   0.00220094 ZEC per block)
+  no-NSM subsidies:    369782673196 (~    3697.827 ZEC,   0.00220109 ZEC per block)
+  difference:             -24602928 (~      -0.246 ZEC),         NSM/no-NSM: 0.9999
+Years  40.. 44 at heights 20462982..22142982:
+  NSM subsidies:       184875159527 (~    1848.752 ZEC,   0.00110045 ZEC per block)
+  no-NSM subsidies:    184890496598 (~    1848.905 ZEC,   0.00110054 ZEC per block)
+  difference:             -15337071 (~      -0.153 ZEC),         NSM/no-NSM: 0.9999
+Years  44.. 48 at heights 22142982..23822982:
+  NSM subsidies:        92435642223 (~     924.356 ZEC,   0.00055021 ZEC per block)
+  no-NSM subsidies:     92444408299 (~     924.444 ZEC,   0.00055026 ZEC per block)
+  difference:              -8766076 (~      -0.088 ZEC),         NSM/no-NSM: 0.9999
+Years  48.. 52 at heights 23822982..25502982:
+  NSM subsidies:        46216852306 (~     462.169 ZEC,   0.00027510 ZEC per block)
+  no-NSM subsidies:     46221832441 (~     462.218 ZEC,   0.00027513 ZEC per block)
+  difference:              -4980135 (~      -0.050 ZEC),         NSM/no-NSM: 0.9999
+Years  52.. 56 at heights 25502982..27182982:
+  NSM subsidies:        23107941677 (~     231.079 ZEC,   0.00013755 ZEC per block)
+  no-NSM subsidies:     23110447929 (~     231.104 ZEC,   0.00013756 ZEC per block)
+  difference:              -2506252 (~      -0.025 ZEC),         NSM/no-NSM: 0.9999
+Years  56.. 60 at heights 27182982..28862982:
+  NSM subsidies:        11553728657 (~     115.537 ZEC,   0.00006877 ZEC per block)
+  no-NSM subsidies:     11554852256 (~     115.549 ZEC,   0.00006878 ZEC per block)
+  difference:              -1123599 (~      -0.011 ZEC),         NSM/no-NSM: 0.9999
+Years  60.. 64 at heights 28862982..30542982:
+  NSM subsidies:         5776743256 (~      57.767 ZEC,   0.00003439 ZEC per block)
+  no-NSM subsidies:      5777426128 (~      57.774 ZEC,   0.00003439 ZEC per block)
+  difference:               -682872 (~      -0.007 ZEC),         NSM/no-NSM: 0.9999
+Years  64.. 68 at heights 30542982..32222982:
+  NSM subsidies:         2888311019 (~      28.883 ZEC,   0.00001719 ZEC per block)
+  no-NSM subsidies:      2888713064 (~      28.887 ZEC,   0.00001719 ZEC per block)
+  difference:               -402045 (~      -0.004 ZEC),         NSM/no-NSM: 0.9999
+Years  68.. 72 at heights 32222982..33902982:
+  NSM subsidies:         1444125052 (~      14.441 ZEC,   0.00000860 ZEC per block)
+  no-NSM subsidies:      1444356532 (~      14.444 ZEC,   0.00000860 ZEC per block)
+  difference:               -231480 (~      -0.002 ZEC),         NSM/no-NSM: 0.9998
+Years  72.. 76 at heights 33902982..35582982:
+  NSM subsidies:          722047128 (~       7.220 ZEC,   0.00000430 ZEC per block)
+  no-NSM subsidies:       722178266 (~       7.222 ZEC,   0.00000430 ZEC per block)
+  difference:               -131138 (~      -0.001 ZEC),         NSM/no-NSM: 0.9998
+Years  76.. 80 at heights 35582982..37262982:
+  NSM subsidies:          361015488 (~       3.610 ZEC,   0.00000215 ZEC per block)
+  no-NSM subsidies:       361089133 (~       3.611 ZEC,   0.00000215 ZEC per block)
+  difference:                -73645 (~      -0.001 ZEC),         NSM/no-NSM: 0.9998
+Years  80.. 84 at heights 37262982..38942982:
+  NSM subsidies:          180506560 (~       1.805 ZEC,   0.00000107 ZEC per block)
+  no-NSM subsidies:       180076275 (~       1.801 ZEC,   0.00000107 ZEC per block)
+  difference:                430285 (~       0.004 ZEC),         NSM/no-NSM: 1.0024
+Years  84.. 88 at heights 38942982..40622982:
+  NSM subsidies:           90245698 (~       0.902 ZEC,   0.00000054 ZEC per block)
+  no-NSM subsidies:        89666429 (~       0.897 ZEC,   0.00000053 ZEC per block)
+  difference:                579269 (~       0.006 ZEC),         NSM/no-NSM: 1.0065
+Years  88.. 92 at heights 40622982..42302982:
+  NSM subsidies:           45126662 (~       0.451 ZEC,   0.00000027 ZEC per block)
+  no-NSM subsidies:        44364923 (~       0.444 ZEC,   0.00000026 ZEC per block)
+  difference:                761739 (~       0.008 ZEC),         NSM/no-NSM: 1.0172
+Years  92.. 96 at heights 42302982..43982982:
+  NSM subsidies:           22552905 (~       0.226 ZEC,   0.00000013 ZEC per block)
+  no-NSM subsidies:        21810753 (~       0.218 ZEC,   0.00000013 ZEC per block)
+  difference:                742152 (~       0.007 ZEC),         NSM/no-NSM: 1.0340
+Years  96..100 at heights 43982982..45662982:
+  NSM subsidies:           11280615 (~       0.113 ZEC,   0.00000007 ZEC per block)
+  no-NSM subsidies:        10437085 (~       0.104 ZEC,   0.00000006 ZEC per block)
+  difference:                843530 (~       0.008 ZEC),         NSM/no-NSM: 1.0808
+Years 100..104 at heights 45662982..47342982:
+  NSM subsidies:            5609808 (~       0.056 ZEC,   0.00000003 ZEC per block)
+  no-NSM subsidies:         4846834 (~       0.048 ZEC,   0.00000003 ZEC per block)
+  difference:                762974 (~       0.008 ZEC),         NSM/no-NSM: 1.1574
+Years 104..108 at heights 47342982..49022982:
+  NSM subsidies:            2702325 (~       0.027 ZEC,   0.00000002 ZEC per block)
+  no-NSM subsidies:         2423417 (~       0.024 ZEC,   0.00000001 ZEC per block)
+  difference:                278908 (~       0.003 ZEC),         NSM/no-NSM: 1.1151
+Years 108..112 at heights 49022982..50702982:
+  NSM subsidies:            1680000 (~       0.017 ZEC,   0.00000001 ZEC per block)
+  no-NSM subsidies:          743417 (~       0.007 ZEC,   0.00000000 ZEC per block)
+  difference:                936583 (~       0.009 ZEC),         NSM/no-NSM: 2.2598
 ```
 
 The program will also output PNG files with plots of the issuance curve in `plots/`:
 
-![ZSF balance simulation](plots/zsf_balance.png)
-![ZSF block subsidy simulation](plots/zsf_block_subsidy.png)
+![NSM balance simulation](plots/nsm_balance.png)
+![NSM block subsidy simulation](plots/nsm_block_subsidy.png)
 
 ## About this repo
 
-This simulator is part of our larger efforts to implement the Zcash Sustainability Fund, watch the presentation [here](https://www.youtube.com/watch?v=_QSYgvDV33k)
+This simulator is part of our larger efforts to implement the Network Sustainability Mechanism.
+They are described in a ZconV presentation by Eiger and Shielded Labs (from when it was called the
+Zcash Sustainability Fund) that is available [here](https://www.youtube.com/watch?v=_QSYgvDV33k).
 
 ## About [Eiger](https://www.eiger.co)
 
-We are engineers. We contribute to various ecosystems by building low level implementations and core components. We believe in Zcash because privacy is critical to a well functioning society.
+We are engineers. We contribute to various ecosystems by building low level implementations and
+core components. We believe in Zcash because privacy is critical to a well functioning society.
 
 Contact us at hello@eiger.co
 Follow us on [X/Twitter](https://x.com/eiger_co)
